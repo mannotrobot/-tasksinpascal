@@ -9,7 +9,7 @@ ok    - при пересечение границы экрана перемеж
       на противоположную сторону;
 ok    - escape выход;
 ok    - направление движения меняется под прямым углом;
-      - изменение направления при нажатии клавиш;
+ok    - изменение направления при нажатии клавиш;
 }
 
 uses
@@ -48,7 +48,7 @@ end;
 
 procedure hide_symbol(x, y: integer);
 begin
-    delay(100);
+    delay(1000);
     gotoxy(x, y);
     write(' ');
     gotoxy(1, 1);
@@ -112,6 +112,13 @@ begin
         move_object(obj);
 end;
 
+procedure set_direction(var obj : object_game; delta: integer);
+begin
+    obj.direction := delta;
+    obj.count := 0;
+    turn(obj);
+end;
+
 var
     star : object_game;
     code: integer;
@@ -134,7 +141,11 @@ begin
        end;
        get_key(code);
        case code of
-           27: break
+           27 : break;
+           -75: set_direction(star, 0);
+           -77: set_direction(star, 1);
+           -72: set_direction(star, 2);
+           -80: set_direction(star, 3);
        end
     end;
     clrscr;
