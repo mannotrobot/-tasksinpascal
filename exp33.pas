@@ -7,7 +7,9 @@ ok    - * движется с задержкой 1/10;
 ok    - каждые 10 шагов меняет направ. движения;
 ok    - при пересечение границы экрана перемежается \
       на противоположную сторону;
-ok    - escape выход; 
+ok    - escape выход;
+ok    - направление движения меняется под прямым углом;
+      - изменение направления при нажатии клавиш;
 }
 
 uses
@@ -80,6 +82,22 @@ begin
     hide_symbol(obj.x, obj.y);
 end;
 
+procedure update_xy(var obj: object_game; x, y: integer);
+begin
+    obj.x := obj.x + x;
+    obj.y := obj.y + y;
+end;
+
+procedure turn(var obj: object_game);
+begin
+    case obj.direction of
+        0: update_xy(obj, 1, 1);
+        1: update_xy(obj, -1, 1);
+        2: update_xy(obj, 1, 1 );
+        3: update_xy(obj, 1, -1);
+    end; 
+end;
+
 procedure random_move(var obj: object_game);
 begin
     obj.count:= obj.count + 1;
@@ -87,6 +105,7 @@ begin
     begin
         obj.count := 0;
         obj.direction := random(4);
+        turn(obj);
         move_object(obj);
     end
     else
@@ -102,8 +121,8 @@ begin
     star.x := screenwidth div 2;
     star.y := screenheight div 2;
     star.symbol := '*';
-    star.count := 1;
-    star.direction := 0;
+    star.count := 0;
+    star.direction := 1;
     while True do
     begin
        while not keypressed do
