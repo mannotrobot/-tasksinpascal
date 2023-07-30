@@ -10,6 +10,8 @@ ok    - при пересечение границы экрана перемеж
 ok    - escape выход;
 ok    - направление движения меняется под прямым углом;
 ok    - изменение направления при нажатии клавиш;
+      - добавить очередь для изменения направления, если \
+        очередб пуста менять радномно;
 }
 
 uses
@@ -39,6 +41,13 @@ type
         direction: integer;
     end;
 
+    queue_dir = record
+        state : boolean;
+        count : integer;
+        pos   : integer;
+        dirs  : array [0..999] of integer;
+    end;
+
 procedure show_object(var obj: object_game);
 begin
     gotoxy(obj.x, obj.y);
@@ -48,7 +57,7 @@ end;
 
 procedure hide_symbol(x, y: integer);
 begin
-    delay(1000);
+    delay(100);
     gotoxy(x, y);
     write(' ');
     gotoxy(1, 1);
@@ -98,30 +107,62 @@ begin
     end; 
 end;
 
-procedure random_move(var obj: object_game);
+procedure random_move(var obj: object_game; var dirs: queue_dir);
+var
+    cur : integer;
 begin
     obj.count:= obj.count + 1;
     if obj.count > 9 then
     begin
         obj.count := 0;
-        obj.direction := random(4);
-        turn(obj);
-        move_object(obj);
+        if dirs.state then
+        begin
+            cur := dirs.pos;
+            dirs.pos := dirs.pos + 1;
+            obj.direction := dirs.dirs[cur];
+            turn(obj);
+            move_object(obj);
+        end
+        else
+        begin
+            obj.direction := random(4);
+            turn(obj);
+            move_object(obj);
+        end;
     end
     else
+    begin
         move_object(obj);
+    end; 
 end;
 
 procedure set_direction(var obj : object_game; delta: integer);
 begin
     obj.direction := delta;
-    obj.count := 0;
     turn(obj);
+end;
+
+procedure add_dir(var queue: queue_dir; delta: integer);
+var
+    cur: integer;
+begin
+    cur := queue.count;
+    queue.count := queue.count + 1;
+    if queue.count + 1 > 999 then
+    begin
+        queue.state := False;
+    end
+    else
+    begin
+        queue.dirs[cur] := delta;
+        queue.state := True;
+    end;
 end;
 
 var
     star : object_game;
-    code: integer;
+    code : integer;
+    dirs : queue_dir;
 begin
     clrscr;
     randomize;
@@ -136,16 +177,21 @@ begin
        begin
            gotoxy(1, 1);
            write(star.count);
+           write(' | ходов осталось [ ',999 - dirs.count ,' ]');
            gotoxy(1, 1);
-           random_move(star);
+           random_move(star, dirs);
+           if dirs.count = dirs.pos then
+           begin
+               dirs.state := False;
+           end;
        end;
        get_key(code);
        case code of
            27 : break;
-           -75: set_direction(star, 0);
-           -77: set_direction(star, 1);
-           -72: set_direction(star, 2);
-           -80: set_direction(star, 3);
+           -75: add_dir(dirs, 0);
+           -77: add_dir(dirs, 1);
+           -72: add_dir(dirs, 2);
+           -80: add_dir(dirs, 3);
        end
     end;
     clrscr;
