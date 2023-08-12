@@ -5,7 +5,7 @@ var
     name : string;
 begin
     {$I-}
-    name := paramstr(1);
+    name := paramstr(1) + '.bin' ;
     assign(f, name);
     rewrite(f);
     if IOResult <> 0 then
