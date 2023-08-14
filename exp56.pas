@@ -78,28 +78,25 @@ var
     item_one : item;
     item_two : item;
     flag     : boolean;
+    c        : cursor;
+    o        : cursor;
 begin
     new_list := nil;
+    o := first;
     while first <> nil do
     begin
+        c := second;
         item_one := first^.data;
-        while second <> nil do
-        begin
-            flag := check_and_update(item_one, second);
-            if flag then
-            begin
-                writeln(item_one.name, item_one.count);
-                push(new_list, item_one);
-                
-first := first^.next;
-            end;
-            second := second^.next;
-        end; 
+        check_and_update(item_one, c);
+        push(new_list, item_one);
+        first := first^.next;
     end;
+
     while second <> nil do
     begin
         item_two := second^.data;
-        flag := check_and_update(item_two, first);
+        c := o;
+        flag := check_and_update(item_two, c);
         if not flag then
         begin
             push(new_list, item_two);
