@@ -42,18 +42,18 @@ begin
    get_params := command;
 end;
 
-function get_pos(var filename, value: string; var new_item : item): integer;
+function get_pos(var filename, value: string; var new_item : item): longint;
 var
     cur : item;
     f   : file of item;
-    position : integer;
+    position : longint;
 begin
     {$I-}
     assign(f, filename);
     reset(f);
     if IOResult <> 0 then
     begin
-        writeln('Couldn0''t open file ', filename);
+        writeln('Couldn''t open file ', filename);
         halt(1);
     end;
     position := 0;
@@ -74,7 +74,7 @@ end;
 procedure find_item(var arg : string);
 var
    cur : item;
-   pos : integer;
+   pos : longint;
    filename : string;
    f : file of item;
 begin
@@ -90,7 +90,7 @@ begin
     end;
     seek(f, pos);
     read(f, cur);
-    writeln(cur.name,' - ', cur.count);
+    writeln(cur.name,' - ', cur.count, ' | pos:  ', pos);
     close(f);
 end;
 
@@ -99,6 +99,7 @@ var
     cur : item;
     f   : file of item;
     filename : string;
+    i : longint;
 begin
     {$I-}
     filename := arg;
@@ -109,10 +110,12 @@ begin
         writeln('Couldn''t open file ', filename);
         halt(1);
     end;
+    i := 0;
     while not eof(f) do
     begin
         read(f, cur);
-        writeln(cur.name,' - ', cur.count);
+        writeln(cur.name,' - ', cur.count, ' | pos: ', i);
+        i := i + 1;
     end;
     close(f);
 end;
@@ -120,7 +123,7 @@ end;
 procedure add_item(var value: string);
 var
     new_item : item;
-    pos      : integer;
+    pos      : longint;
     f        : file of item;
     filename : string;
 begin

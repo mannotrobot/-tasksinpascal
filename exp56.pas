@@ -17,7 +17,6 @@ type
         next: cursor;
     end;
 
-
 procedure push(var head: cursor; var value: item);
 var
     tmp : cursor;
