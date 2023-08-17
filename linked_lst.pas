@@ -9,6 +9,7 @@ type
     linked_list = npointer;
 
 procedure push(var lst: linked_list; i: integer);
+{добавление в конец списка}
 var
     n: npointer;
 begin
