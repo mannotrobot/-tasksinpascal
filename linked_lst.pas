@@ -44,6 +44,18 @@ begin
     end;
 end;
 
+function sum_lst(var lst: linked_list): integer;
+begin
+     if lst = nil then
+     begin
+         sum_lst := 0
+     end
+     else
+     begin
+         sum_lst := lst^.data + sum_lst(lst^.next);
+     end
+end;
+
 var
    lst : linked_list;
    a   : integer;
@@ -52,10 +64,8 @@ begin
    while not seekeof do
    begin
        read(a);
-       if a mod 2 = 0 then
-       begin
-           push(lst, a);
-       end;
+       push(lst, a);
    end;
    read_link(lst);
+   writeln(sum_lst(lst));
 end.
