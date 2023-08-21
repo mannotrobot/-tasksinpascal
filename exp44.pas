@@ -6,20 +6,130 @@ program exp44;
   - вывести на экран последовальность;
 }
 
-procedure read_stdin_line;
+type
+    ptr = ^node;
+    node = record
+        data: char;
+        next: ptr;
+    end;
+
+procedure init_queue(var head: ptr);
+begin
+    head := nil;
+end;
+
+procedure push_back(var head: ptr; n: char);
+var
+    tmp: ptr;
+begin
+    if head <> nil then
+    begin
+        tmp := @head^;
+        while tmp^.next <> nil do
+        begin
+            tmp := tmp^.next;
+        end;
+        new(tmp^.next);
+        tmp^.next^.data := n;
+        tmp^.next^.next := nil
+    end
+    else
+    begin
+        new(head);
+        head^.data := n;
+        head^.next := nil
+    end;
+end;
+
+function is_max(var max_len: integer; var j: integer): integer;
+var
+    choice : integer;
+begin
+    if j = max_len then
+         choice := 1 
+    else
+    begin
+         if j > max_len then
+         begin
+             choice := 2;
+             max_len := j;
+         end
+         else
+         begin
+             choice := -1;
+         end;
+    end;
+    is_max := choice;
+end;
+
+function is_digit(var i: integer): boolean;
+begin
+     is_digit := (i >= 48) and (i <= 57)
+end;
+
+procedure add_new_seq(var head: ptr; var j: integer; c: char);
+begin
+    writeln(j,'-count-----symbol-', c);
+    while j > 0 do
+    begin
+        push_back(head, c);
+        j := j - 1;
+    end;
+    push_back(head, ' ');
+    j := 1;
+end;
+
+procedure create_new_queue(var head: ptr; var j: integer; c: char);
+begin
+    writeln('start');
+    init_queue(head);
+    add_new_seq(head, j, c);
+    writeln('stop')
+end;
+
+procedure handler_stdin_line(var head: ptr);
 var
     c: char;
     i: integer;
+    j: integer;
+    max_len : integer;
+    flag: boolean;
+    prev_char: char;
 begin
+    max_len := 0;
+    j := 1;
+    prev_char := '*';
+    flag := False;
     while not eoln do
     begin
         read(c);
         i := ord(c);
-        if (i >= 48) and (i <= 57) then
-            writeln(chr(i));
+        if is_digit(i) then
+        begin
+            if c = prev_char then
+            begin
+                 j := j + 1;
+            end
+            else
+            begin
+                if (prev_char = '*') or (j = 1)  then
+                begin
+                    prev_char := c;
+                end;
+                writeln(prev_char, '---> ', j);  
+                j := 1;
+            end;
+        prev_char := c;    
+        end;
     end;
 end;
-
+var
+    head: ptr;
 begin
-    read_stdin_line;
+    handler_stdin_line(head);
+    while head <> nil do
+    begin
+        write(head^.data);
+        head := head^.next;
+    end;
 end.
