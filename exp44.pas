@@ -52,7 +52,6 @@ begin
          if j > max_len then
          begin
              choice := 2;
-             max_len := j;
          end
          else
          begin
@@ -62,14 +61,13 @@ begin
     is_max := choice;
 end;
 
-function is_digit(var i: integer): boolean;
+function is_digit(i: integer): boolean;
 begin
      is_digit := (i >= 48) and (i <= 57)
 end;
 
-procedure add_new_seq(var head: ptr; var j: integer; c: char);
+procedure add_new_seq(var head: ptr; j: integer; c: char);
 begin
-    writeln(j,'-count-----symbol-', c);
     while j > 0 do
     begin
         push_back(head, c);
@@ -79,12 +77,10 @@ begin
     j := 1;
 end;
 
-procedure create_new_queue(var head: ptr; var j: integer; c: char);
+procedure create_new_queue(var head: ptr; j: integer; c: char);
 begin
-    writeln('start');
     init_queue(head);
     add_new_seq(head, j, c);
-    writeln('stop')
 end;
 
 procedure handler_stdin_line(var head: ptr);
@@ -93,8 +89,8 @@ var
     i: integer;
     j: integer;
     max_len : integer;
-    flag: boolean;
     prev_char: char;
+    choice : integer;
 begin
     max_len := 0;
     j := 1;
@@ -104,25 +100,33 @@ begin
     begin
         read(c);
         i := ord(c);
-        if is_digit(i) then
+        if is_digit(i) and (prev_char = c) then
         begin
-            if c = prev_char then
-            begin
-                 j := j + 1;
-            end
-            else
-            begin
-                if (prev_char = '*') or (j = 1)  then
-                begin
-                    prev_char := c;
-                end;
-                writeln(prev_char, '---> ', j);  
-                j := 1;
-            end;
-        prev_char := c;    
+            j := j + 1;
         end;
+        if (c <> prev_char) or eoln then
+        begin
+            choice := is_max(max_len, j);
+            i := ord(prev_char);
+            if is_digit(i) then
+            begin
+                case choice of
+                    2: begin
+                           max_len:= j;
+                           create_new_queue(head, j, prev_char);
+                       end;
+                    1: begin
+                           add_new_seq(head, j, prev_char);
+                       end;
+                    -1: continue
+                end;
+            end;
+            j := 1;
+        end;
+        prev_char := c;
     end;
 end;
+
 var
     head: ptr;
 begin
